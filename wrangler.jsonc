@@ -1,0 +1,9 @@
+{
+	// Static-only deploy: no Worker code runs, Cloudflare serves ./dist from the edge.
+	// An adapter is only needed if this site later adopts on-demand rendering.
+	"name": "gavinmeeker-com",
+	"compatibility_date": "2026-08-13",
+	"assets": {
+		"directory": "./dist"
+	}
+}
