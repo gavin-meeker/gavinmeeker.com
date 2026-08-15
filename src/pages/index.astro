@@ -1,8 +1,30 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
+import AppWindow from '../components/office/AppWindow.astro';
+import RibbonButton from '../components/office/RibbonButton.astro';
+import RibbonGroup from '../components/office/RibbonGroup.astro';
+import Sheet from '../components/office/Sheet.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 4);
+
+const projects = (await getCollection('projects', ({ data }) => !data.draft))
+	.sort((a, b) => a.data.order - b.data.order)
+	.slice(0, 3);
+
+const fmt = (d: Date) =>
+	d.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+// Row bookkeeping, so both tables shift together as content grows.
+const PROJ_HEAD = 11;
+const PROJ_FIRST = PROJ_HEAD + 1;
+const WRITE_HEAD = PROJ_FIRST + projects.length + 1;
+const WRITE_FIRST = WRITE_HEAD + 1;
+const TOTAL_ROW = WRITE_FIRST + posts.length + 1;
+const ROWS = TOTAL_ROW + 2;
 ---
 
 <!doctype html>
@@ -11,39 +33,201 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
+		<AppWindow
+			app="excel"
+			fileName="gavinmeeker.xlsx"
+			tabs={['Home', 'Insert', 'Draw', 'Formulas', 'Data', 'Review', 'View']}
+			status="Ready"
+		>
+			<Fragment slot="ribbon">
+				<RibbonGroup label="Clipboard">
+					<RibbonButton variant="tall" icon="📋">Paste</RibbonButton>
+				</RibbonGroup>
+
+				<RibbonGroup label="Font">
+					<div class="flex flex-col gap-1">
+						<div class="flex gap-1">
+							<RibbonButton variant="select" wide>Schibsted Grotesk</RibbonButton>
+							<RibbonButton variant="select">11</RibbonButton>
+						</div>
+						<div class="flex gap-1">
+							<RibbonButton style="bold">B</RibbonButton>
+							<RibbonButton style="italic">I</RibbonButton>
+							<RibbonButton style="underline">U</RibbonButton>
+							<RibbonButton>▦</RibbonButton>
+						</div>
+					</div>
+				</RibbonGroup>
+
+				<RibbonGroup label="Alignment">
+					<div class="flex flex-col gap-1">
+						<div class="flex gap-1">
+							<RibbonButton>≡</RibbonButton>
+							<RibbonButton>≣</RibbonButton>
+							<RibbonButton>≡</RibbonButton>
+						</div>
+						<div class="flex gap-1">
+							<RibbonButton>Wrap</RibbonButton>
+							<RibbonButton>Merge</RibbonButton>
+						</div>
+					</div>
+				</RibbonGroup>
+
+				<RibbonGroup label="Number">
+					<div class="flex flex-col gap-1">
+						<RibbonButton variant="select" wide>General</RibbonButton>
+						<div class="flex gap-1">
+							<RibbonButton>$</RibbonButton>
+							<RibbonButton>%</RibbonButton>
+							<RibbonButton>.00</RibbonButton>
+						</div>
+					</div>
+				</RibbonGroup>
+
+				<RibbonGroup label="Editing" last>
+					<div class="flex flex-col gap-1">
+						<RibbonButton>Σ AutoSum</RibbonButton>
+						<RibbonButton>Sort &amp; Filter</RibbonButton>
+					</div>
+				</RibbonGroup>
+			</Fragment>
+
+			<Fragment slot="subbar">
+				<div class="flex items-center gap-2 border-b border-line bg-surface px-2 py-1.5">
+					<span
+						class="min-w-[4.5rem] rounded-sm border border-line px-1.5 py-0.5 font-mono text-[0.72rem]"
+					>
+						A2
+					</span>
+					<span class="px-1 font-mono text-[0.72rem] text-muted italic">fx</span>
+					<span
+						class="flex-1 truncate rounded-sm border border-line px-1.5 py-0.5 font-mono text-[0.72rem]"
+					>
+						=CONCAT("Gavin"," ","Meeker")
+					</span>
+				</div>
+			</Fragment>
+
+			<Sheet cols={8} rows={ROWS} activeCols={[1, 4]} activeRows={[2, 5]}>
+				<!-- Name: a merged, selected cell -->
+				<div
+					class="cell-selected handle relative flex items-center px-2"
+					style="grid-column: 1 / 5; grid-row: 2 / 6;"
+				>
+					<h1
+						class="m-0 text-[clamp(1.9rem,4.4vw,3.4rem)] leading-none font-bold tracking-[-0.035em] text-ink"
+					>
+						Gavin Meeker
+					</h1>
+				</div>
+
+				<div
+					class="cell flex items-center px-2 text-sm leading-snug text-muted"
+					style="grid-column: 1 / 7; grid-row: 7 / 9;"
+				>
+					Software engineer. I build for the web and write about the parts that turned out harder
+					than they looked.
+				</div>
+
+				<!-- Projects table -->
+				<div
+					class="app-powerpoint cell-head flex items-center px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
+					style={`grid-column: 1 / 3; grid-row: ${PROJ_HEAD};`}
+				>
+					Project
+				</div>
+				<div
+					class="app-powerpoint cell-head flex items-center px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
+					style={`grid-column: 3 / 7; grid-row: ${PROJ_HEAD};`}
+				>
+					Stack
+				</div>
+				<div
+					class="app-powerpoint cell-head flex items-center justify-end px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
+					style={`grid-column: 7 / 8; grid-row: ${PROJ_HEAD};`}
+				>
+					Year
+				</div>
+
+				{
+					projects.map((p, i) => (
+						<>
+							<a
+								href="/projects"
+								class="app-powerpoint cell flex items-center truncate px-2 text-sm text-app underline underline-offset-2 hover:bg-app/5"
+								style={`grid-column: 1 / 3; grid-row: ${PROJ_FIRST + i};`}
+							>
+								{p.data.title}
+							</a>
+							<div
+								class="app-powerpoint cell flex items-center truncate px-2 text-[0.78rem] text-muted"
+								style={`grid-column: 3 / 7; grid-row: ${PROJ_FIRST + i};`}
+							>
+								{p.data.tags.join(', ')}
+							</div>
+							<div
+								class="app-powerpoint cell flex items-center justify-end px-2 font-mono text-[0.72rem]"
+								style={`grid-column: 7 / 8; grid-row: ${PROJ_FIRST + i};`}
+							>
+								{p.data.year}
+							</div>
+						</>
+					))
+				}
+
+				<!-- Writing table -->
+				<div
+					class="app-word cell-head flex items-center px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
+					style={`grid-column: 1 / 3; grid-row: ${WRITE_HEAD};`}
+				>
+					Recent writing
+				</div>
+				<div
+					class="app-word cell-head flex items-center px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
+					style={`grid-column: 3 / 7; grid-row: ${WRITE_HEAD};`}
+				>
+					Description
+				</div>
+				<div
+					class="app-word cell-head flex items-center justify-end px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
+					style={`grid-column: 7 / 8; grid-row: ${WRITE_HEAD};`}
+				>
+					Published
+				</div>
+
+				{
+					posts.map((post, i) => (
+						<>
+							<a
+								href={`/blog/${post.id}/`}
+								class="app-word cell flex items-center truncate px-2 text-sm text-app underline underline-offset-2 hover:bg-app/5"
+								style={`grid-column: 1 / 3; grid-row: ${WRITE_FIRST + i};`}
+							>
+								{post.data.title}
+							</a>
+							<div
+								class="app-word cell flex items-center truncate px-2 text-[0.78rem] text-muted"
+								style={`grid-column: 3 / 7; grid-row: ${WRITE_FIRST + i};`}
+							>
+								{post.data.description}
+							</div>
+							<div
+								class="app-word cell flex items-center justify-end px-2 font-mono text-[0.72rem] text-muted"
+								style={`grid-column: 7 / 8; grid-row: ${WRITE_FIRST + i};`}
+							>
+								{fmt(post.data.pubDate)}
+							</div>
+						</>
+					))
+				}
+
+				<div
+					class="cell flex items-center px-2 font-mono text-[0.7rem] text-muted"
+					style={`grid-column: 1 / 6; grid-row: ${TOTAL_ROW};`}
+				>
+					=COUNTA() &rarr; {posts.length} posts, {projects.length} projects
+				</div>
+			</Sheet>
+		</AppWindow>
 	</body>
 </html>

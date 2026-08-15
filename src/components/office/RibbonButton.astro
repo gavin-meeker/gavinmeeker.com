@@ -1,0 +1,57 @@
+---
+/*
+  A ribbon control. `variant` covers the three shapes Office uses:
+    tall   — big icon with a caption underneath (Paste, New Slide)
+    icon   — compact square (B, I, U, alignment)
+    select — a dropdown-looking field (font family, number format)
+*/
+interface Props {
+	variant?: 'tall' | 'icon' | 'select';
+	icon?: string;
+	/** Applied to the label: bold / italic / underline, as the button implies. */
+	style?: 'bold' | 'italic' | 'underline';
+	wide?: boolean;
+}
+
+const { variant = 'icon', icon, style, wide = false } = Astro.props;
+
+const styleClass = {
+	bold: 'font-bold',
+	italic: 'italic',
+	underline: 'underline',
+}[style ?? ''] ?? '';
+---
+
+{
+	variant === 'select' ? (
+		<span
+			class:list={[
+				'inline-flex items-center rounded-sm border border-line bg-surface px-1.5 py-0.5 text-[0.68rem] text-ink select-none',
+				wide ? 'min-w-[8.5rem]' : 'min-w-[2.6rem]',
+			]}
+		>
+			<slot />
+			<span class="ml-auto pl-2 text-muted" aria-hidden="true">
+				▾
+			</span>
+		</span>
+	) : variant === 'tall' ? (
+		<span class="inline-flex shrink-0 flex-col items-center gap-0.5 rounded-sm border border-transparent px-2 py-1 select-none hover:border-line hover:bg-head">
+			<span class="text-lg leading-none" aria-hidden="true">
+				{icon}
+			</span>
+			<span class="text-[0.62rem] leading-none">
+				<slot />
+			</span>
+		</span>
+	) : (
+		<span
+			class:list={[
+				'inline-flex min-w-6 shrink-0 items-center justify-center rounded-sm border border-transparent px-1.5 py-1 font-mono text-[0.68rem] whitespace-nowrap text-ink select-none hover:border-line hover:bg-head',
+				styleClass,
+			]}
+		>
+			<slot />
+		</span>
+	)
+}

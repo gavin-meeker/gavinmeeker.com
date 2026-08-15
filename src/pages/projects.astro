@@ -1,0 +1,187 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import AppWindow from '../components/office/AppWindow.astro';
+import RibbonButton from '../components/office/RibbonButton.astro';
+import RibbonGroup from '../components/office/RibbonGroup.astro';
+
+const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+	(a, b) => a.data.order - b.data.order || b.data.year.localeCompare(a.data.year),
+);
+
+const title = 'Projects';
+const description = 'Selected work — things I have designed, built, and shipped.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<AppWindow
+			app="powerpoint"
+			fileName="projects.pptx"
+			tabs={['Home', 'Insert', 'Draw', 'Design', 'Transitions', 'Animations', 'Slide Show', 'View']}
+			status={`Slide 1 of ${projects.length} · English (US)`}
+		>
+			<Fragment slot="ribbon">
+				<RibbonGroup label="Slides">
+					<RibbonButton variant="tall" icon="▭">New Slide</RibbonButton>
+					<div class="flex flex-col gap-1">
+						<RibbonButton>Layout ▾</RibbonButton>
+						<RibbonButton>Reset</RibbonButton>
+					</div>
+				</RibbonGroup>
+
+				<RibbonGroup label="Font">
+					<div class="flex flex-col gap-1">
+						<div class="flex gap-1">
+							<RibbonButton variant="select" wide>Schibsted Grotesk</RibbonButton>
+							<RibbonButton variant="select">18</RibbonButton>
+						</div>
+						<div class="flex gap-1">
+							<RibbonButton style="bold">B</RibbonButton>
+							<RibbonButton style="italic">I</RibbonButton>
+							<RibbonButton style="underline">U</RibbonButton>
+						</div>
+					</div>
+				</RibbonGroup>
+
+				<RibbonGroup label="Drawing">
+					<div class="flex gap-1">
+						<span class="inline-flex size-8 items-center justify-center rounded-sm border border-line bg-surface text-xs">▭</span>
+						<span class="inline-flex size-8 items-center justify-center rounded-sm border border-line bg-surface text-xs">◯</span>
+						<span class="inline-flex size-8 items-center justify-center rounded-sm border border-line bg-surface text-xs">▷</span>
+					</div>
+				</RibbonGroup>
+
+				<RibbonGroup label="Slide Show" last>
+					<div class="flex flex-col gap-1">
+						<RibbonButton>▶ From Start</RibbonButton>
+						<RibbonButton>Rehearse</RibbonButton>
+					</div>
+				</RibbonGroup>
+			</Fragment>
+
+			<Fragment slot="subbar">
+				<div
+					class="flex items-center gap-3 border-b border-line bg-surface px-3 py-1.5 font-mono text-[0.68rem] text-muted"
+				>
+					<span>Normal View</span>
+					<span class="text-line">|</span>
+					<span>{projects.length} slides</span>
+					<span class="ml-auto hidden wide:inline">Zoom 100%</span>
+				</div>
+			</Fragment>
+
+			<div class="grid bg-canvas wide:grid-cols-[13rem_minmax(0,1fr)]">
+				<!-- Slide thumbnail rail -->
+				<nav
+					aria-label="Slides"
+					class="hidden flex-col gap-3 border-r border-line bg-head p-3 wide:flex"
+				>
+					{
+						projects.map((p, i) => (
+							<a
+								href={`#slide-${i + 1}`}
+								class="group flex gap-2 no-underline"
+							>
+								<span class="pt-1 font-mono text-[0.66rem] text-muted">{i + 1}</span>
+								<span class="flex aspect-video flex-1 flex-col justify-center overflow-hidden border border-line bg-surface px-2 transition-colors group-hover:border-app">
+									<span class="truncate text-[0.62rem] leading-tight font-semibold text-ink">
+										{p.data.title}
+									</span>
+									<span class="mt-0.5 h-px w-6 bg-app"></span>
+								</span>
+							</a>
+						))
+					}
+				</nav>
+
+				<!-- Slide canvas -->
+				<div class="flex flex-col gap-8 p-4 wide:gap-12 wide:p-8">
+					{
+						projects.map((project, i) => (
+							<section id={`slide-${i + 1}`} class="scroll-mt-4">
+								<div class="animate-rise border border-line bg-surface shadow-page">
+									{/* Slide title bar */}
+									<div class="border-b-2 border-app px-6 pt-6 pb-3 wide:px-10 wide:pt-8">
+										<div class="flex items-baseline gap-3">
+											<h2 class="m-0 text-2xl leading-tight font-bold text-ink wide:text-3xl">
+												{project.data.title}
+											</h2>
+											<span class="ml-auto font-mono text-[0.66rem] tracking-widest text-muted">
+												{project.data.year}
+											</span>
+										</div>
+									</div>
+
+									{/* Title-and-content layout: text left, screenshot right */}
+									<div class="grid gap-6 p-6 wide:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] wide:gap-10 wide:p-10">
+										<div class="flex flex-col">
+											<ul class="m-0 list-none space-y-3 p-0">
+												<li class="flex gap-2.5 text-[0.95rem] leading-relaxed text-ink">
+													<span class="mt-2 size-1.5 shrink-0 bg-app" aria-hidden="true" />
+													<span>{project.data.blurb}</span>
+												</li>
+											</ul>
+
+											{project.data.tags.length > 0 && (
+												<ul class="mt-6 flex list-none flex-wrap gap-2 p-0">
+													{project.data.tags.map((tag) => (
+														<li class="border border-line px-2 py-1 font-mono text-[0.62rem] tracking-widest text-muted uppercase">
+															{tag}
+														</li>
+													))}
+												</ul>
+											)}
+
+											<div class="mt-auto flex flex-wrap gap-5 pt-6">
+												{project.data.url && (
+													<a
+														href={project.data.url}
+														target="_blank"
+														rel="noopener"
+														class="font-mono text-[0.68rem] tracking-widest text-app uppercase underline underline-offset-4"
+													>
+														Visit →
+													</a>
+												)}
+												{project.data.repo && (
+													<a
+														href={project.data.repo}
+														target="_blank"
+														rel="noopener"
+														class="font-mono text-[0.68rem] tracking-widest text-app uppercase underline underline-offset-4"
+													>
+														Source →
+													</a>
+												)}
+											</div>
+										</div>
+
+										<div class="overflow-hidden border border-line bg-head">
+											<Image
+												src={project.data.screenshot}
+												alt={project.data.screenshotAlt}
+												width={1200}
+												class="block aspect-video w-full object-cover object-top"
+											/>
+										</div>
+									</div>
+								</div>
+
+								{/* Speaker notes */}
+								<p class="mt-3 px-1 font-mono text-[0.66rem] text-muted">
+									Slide {i + 1} of {projects.length} · Click to add notes
+								</p>
+							</section>
+						))
+					}
+				</div>
+			</div>
+		</AppWindow>
+	</body>
+</html>

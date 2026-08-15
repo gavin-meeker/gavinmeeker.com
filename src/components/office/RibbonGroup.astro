@@ -1,0 +1,25 @@
+---
+/*
+  One labelled cluster of ribbon controls — "Clipboard", "Font", "Slides".
+  Purely decorative chrome: rendered as inert spans, not buttons, so nothing
+  advertises an interaction that isn't there. See IDEAS.md for making these live.
+*/
+interface Props {
+	label: string;
+	last?: boolean;
+}
+
+const { label, last = false } = Astro.props;
+---
+
+<div
+	class:list={[
+		'flex shrink-0 flex-col justify-between px-3',
+		last ? '' : 'border-r border-line',
+	]}
+>
+	<div class="flex items-center gap-1.5">
+		<slot />
+	</div>
+	<span class="mt-1.5 text-center text-[0.6rem] leading-none text-muted">{label}</span>
+</div>

@@ -1,0 +1,85 @@
+---
+/*
+  A spreadsheet grid: column headers, numbered row gutter, and a cell area.
+
+  Gridlines are a repeating background (see `.cells` in global.css), so empty
+  cells cost no markup — slot content positions itself with inline
+  `grid-column` / `grid-row`.
+*/
+interface Props {
+	cols?: number;
+	rows?: number;
+	/** Minimum width before the sheet scrolls horizontally. */
+	minWidth?: string;
+	/**
+	 * Selected range, as [start, end] 1-based inclusive. The matching column and
+	 * row headers get highlighted, the way Excel marks the active selection.
+	 */
+	activeCols?: [number, number];
+	activeRows?: [number, number];
+}
+
+const { cols = 8, rows = 30, minWidth = '46rem', activeCols, activeRows } = Astro.props;
+
+const columns = Array.from({ length: cols }, (_, i) => String.fromCharCode(65 + i));
+
+const inRange = (n: number, range?: [number, number]) =>
+	!!range && n >= range[0] && n <= range[1];
+
+const headerBase =
+	'border-r border-line text-center font-mono text-[0.74rem] transition-colors';
+const gutterBase =
+	'flex items-center justify-center border-b border-line font-mono text-[0.72rem]';
+---
+
+<div class="overflow-x-auto">
+	<div style={`min-width:${minWidth};`}>
+		<!-- Column headers -->
+		<div
+			class="grid border-b-2 border-frame bg-header"
+			style={`grid-template-columns: 2.5rem repeat(${cols}, minmax(0,1fr));`}
+		>
+			<span class="border-r border-line"></span>
+			{
+				columns.map((c, i) => (
+					<span
+						class:list={[
+							headerBase,
+							'py-1.5',
+							inRange(i + 1, activeCols)
+								? 'border-b-2 border-b-app bg-app/12 font-semibold text-app'
+								: 'text-header-ink',
+						]}
+					>
+						{c}
+					</span>
+				))
+			}
+		</div>
+
+		<div class="grid" style="grid-template-columns: 2.5rem minmax(0,1fr);">
+			<!-- Row gutter -->
+			<div class="grid auto-rows-[--spacing(row)] border-r-2 border-frame bg-header">
+				{
+					Array.from({ length: rows }, (_, i) => (
+						<span
+							class:list={[
+								gutterBase,
+								inRange(i + 1, activeRows)
+									? 'border-r-2 border-r-app bg-app/12 font-semibold text-app'
+									: 'text-header-ink',
+							]}
+						>
+							{i + 1}
+						</span>
+					))
+				}
+			</div>
+
+			<!-- Cells -->
+			<div class="cells" style={`--cols:${cols}; min-height:calc(${rows} * var(--spacing-row));`}>
+				<slot />
+			</div>
+		</div>
+	</div>
+</div>
