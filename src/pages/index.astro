@@ -2,8 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import AppWindow from '../components/office/AppWindow.astro';
-import RibbonButton from '../components/office/RibbonButton.astro';
-import RibbonGroup from '../components/office/RibbonGroup.astro';
+import Icon from '../components/office/Icon.astro';
 import Sheet from '../components/office/Sheet.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
@@ -18,12 +17,32 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft))
 const fmt = (d: Date) =>
 	d.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
-// Row bookkeeping, so both tables shift together as content grows.
-const PROJ_HEAD = 11;
+// Excel's own HYPERLINK() is how links are actually written in a cell, so the
+// formula doubles as the link text rather than being decoration.
+const contacts = [
+	{
+		label: 'GitHub',
+		icon: 'github' as const,
+		href: 'https://github.com/gavin-meeker',
+		shown: 'github.com/gavin-meeker',
+	},
+	{
+		label: 'Email',
+		icon: 'mail' as const,
+		href: 'mailto:gmeeker99@gmail.com',
+		shown: 'gmeeker99@gmail.com',
+	},
+];
+
+// Row bookkeeping, so everything shifts together as content grows.
+// Name occupies rows 2–5, tagline 7–8, then contacts, then the tables.
+const CONTACT_FIRST = 9;
+const PROJ_HEAD = CONTACT_FIRST + contacts.length + 1;
 const PROJ_FIRST = PROJ_HEAD + 1;
 const WRITE_HEAD = PROJ_FIRST + projects.length + 1;
 const WRITE_FIRST = WRITE_HEAD + 1;
 const TOTAL_ROW = WRITE_FIRST + posts.length + 1;
+
 const ROWS = TOTAL_ROW + 2;
 ---
 
@@ -36,61 +55,8 @@ const ROWS = TOTAL_ROW + 2;
 		<AppWindow
 			app="excel"
 			fileName="gavinmeeker.xlsx"
-			tabs={['Home', 'Insert', 'Draw', 'Formulas', 'Data', 'Review', 'View']}
 			status="Ready"
 		>
-			<Fragment slot="ribbon">
-				<RibbonGroup label="Clipboard">
-					<RibbonButton variant="tall" icon="📋">Paste</RibbonButton>
-				</RibbonGroup>
-
-				<RibbonGroup label="Font">
-					<div class="flex flex-col gap-1">
-						<div class="flex gap-1">
-							<RibbonButton variant="select" wide>Schibsted Grotesk</RibbonButton>
-							<RibbonButton variant="select">11</RibbonButton>
-						</div>
-						<div class="flex gap-1">
-							<RibbonButton style="bold">B</RibbonButton>
-							<RibbonButton style="italic">I</RibbonButton>
-							<RibbonButton style="underline">U</RibbonButton>
-							<RibbonButton>▦</RibbonButton>
-						</div>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Alignment">
-					<div class="flex flex-col gap-1">
-						<div class="flex gap-1">
-							<RibbonButton>≡</RibbonButton>
-							<RibbonButton>≣</RibbonButton>
-							<RibbonButton>≡</RibbonButton>
-						</div>
-						<div class="flex gap-1">
-							<RibbonButton>Wrap</RibbonButton>
-							<RibbonButton>Merge</RibbonButton>
-						</div>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Number">
-					<div class="flex flex-col gap-1">
-						<RibbonButton variant="select" wide>General</RibbonButton>
-						<div class="flex gap-1">
-							<RibbonButton>$</RibbonButton>
-							<RibbonButton>%</RibbonButton>
-							<RibbonButton>.00</RibbonButton>
-						</div>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Editing" last>
-					<div class="flex flex-col gap-1">
-						<RibbonButton>Σ AutoSum</RibbonButton>
-						<RibbonButton>Sort &amp; Filter</RibbonButton>
-					</div>
-				</RibbonGroup>
-			</Fragment>
 
 			<Fragment slot="subbar">
 				<div class="flex items-center gap-2 border-b border-line bg-surface px-2 py-1.5">
@@ -128,6 +94,37 @@ const ROWS = TOTAL_ROW + 2;
 				Software engineer. Turning complex financial logic into reliable, full-stack software
 				</div>
 
+				<!-- Contact, below the name. Kept in the left-hand columns: the
+				     sheet scrolls horizontally on a phone, so anything past
+				     column D is invisible without sideways scrolling. -->
+				{
+					contacts.map((c, i) => (
+						<a
+							href={c.href}
+							class="cell grid no-underline hover:bg-app/5"
+							style={`grid-column: 1 / 6; grid-row: ${CONTACT_FIRST + i}; grid-template-columns: repeat(5, minmax(0,1fr));`}
+						>
+							<span
+								class="flex h-full items-center gap-2.5 px-2 text-base text-ink"
+								style="grid-column: 1 / 3;"
+							>
+								<Icon name={c.icon} class="size-4 text-app" />
+								{c.label}
+							</span>
+							<span
+								class="flex h-full items-center truncate border-l border-line px-2 font-mono text-[0.85rem] text-app underline underline-offset-2"
+								style="grid-column: 3 / 6;"
+							>
+								{/* The formula wrapper is the joke, but it costs ~13 characters
+								    that a phone does not have. Shown only where it fits. */}
+								<span class="hidden wide:inline">=HYPERLINK("</span>
+								{c.shown}
+								<span class="hidden wide:inline">")</span>
+							</span>
+						</a>
+					))
+				}
+
 				<!-- Projects table -->
 				<div
 					class="app-powerpoint cell-head flex items-center px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
@@ -150,27 +147,30 @@ const ROWS = TOTAL_ROW + 2;
 
 				{
 					projects.map((p, i) => (
-						<>
-							<a
-								href="/projects"
-								class="app-powerpoint cell flex items-center truncate px-2 text-sm text-app underline underline-offset-2 hover:bg-app/5"
-								style={`grid-column: 1 / 3; grid-row: ${PROJ_FIRST + i};`}
+						<a
+							href="/projects"
+							class="app-powerpoint cell grid no-underline hover:bg-app/5"
+							style={`grid-column: 1 / 8; grid-row: ${PROJ_FIRST + i}; grid-template-columns: repeat(7, minmax(0,1fr));`}
+						>
+							<span
+								class="flex h-full items-center truncate px-2 text-sm text-app underline underline-offset-2"
+								style="grid-column: 1 / 3;"
 							>
 								{p.data.title}
-							</a>
-							<div
-								class="app-powerpoint cell flex items-center truncate px-2 text-[0.78rem] text-muted"
-								style={`grid-column: 3 / 7; grid-row: ${PROJ_FIRST + i};`}
+							</span>
+							<span
+								class="flex h-full items-center truncate border-l border-line px-2 text-[0.78rem] text-muted"
+								style="grid-column: 3 / 7;"
 							>
 								{p.data.tags.join(', ')}
-							</div>
-							<div
-								class="app-powerpoint cell flex items-center justify-end px-2 font-mono text-[0.72rem]"
-								style={`grid-column: 7 / 8; grid-row: ${PROJ_FIRST + i};`}
+							</span>
+							<span
+								class="flex h-full items-center justify-end border-l border-line px-2 font-mono text-[0.72rem] text-ink"
+								style="grid-column: 7 / 8;"
 							>
 								{p.data.year}
-							</div>
-						</>
+							</span>
+						</a>
 					))
 				}
 
@@ -196,27 +196,30 @@ const ROWS = TOTAL_ROW + 2;
 
 				{
 					posts.map((post, i) => (
-						<>
-							<a
-								href={`/blog/${post.id}/`}
-								class="app-word cell flex items-center truncate px-2 text-sm text-app underline underline-offset-2 hover:bg-app/5"
-								style={`grid-column: 1 / 3; grid-row: ${WRITE_FIRST + i};`}
+						<a
+							href={`/blog/${post.id}/`}
+							class="app-word cell grid no-underline hover:bg-app/5"
+							style={`grid-column: 1 / 8; grid-row: ${WRITE_FIRST + i}; grid-template-columns: repeat(7, minmax(0,1fr));`}
+						>
+							<span
+								class="flex h-full items-center truncate px-2 text-sm text-app underline underline-offset-2"
+								style="grid-column: 1 / 3;"
 							>
 								{post.data.title}
-							</a>
-							<div
-								class="app-word cell flex items-center truncate px-2 text-[0.78rem] text-muted"
-								style={`grid-column: 3 / 7; grid-row: ${WRITE_FIRST + i};`}
+							</span>
+							<span
+								class="flex h-full items-center truncate border-l border-line px-2 text-[0.78rem] text-muted"
+								style="grid-column: 3 / 7;"
 							>
 								{post.data.description}
-							</div>
-							<div
-								class="app-word cell flex items-center justify-end px-2 font-mono text-[0.72rem] text-muted"
-								style={`grid-column: 7 / 8; grid-row: ${WRITE_FIRST + i};`}
+							</span>
+							<span
+								class="flex h-full items-center justify-end border-l border-line px-2 font-mono text-[0.72rem] text-muted"
+								style="grid-column: 7 / 8;"
 							>
 								{fmt(post.data.pubDate)}
-							</div>
-						</>
+							</span>
+						</a>
 					))
 				}
 
@@ -226,6 +229,7 @@ const ROWS = TOTAL_ROW + 2;
 				>
 					=COUNTA() &rarr; {posts.length} posts, {projects.length} projects
 				</div>
+
 			</Sheet>
 		</AppWindow>
 	</body>

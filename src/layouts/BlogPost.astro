@@ -4,8 +4,6 @@ import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import AppWindow from '../components/office/AppWindow.astro';
-import RibbonButton from '../components/office/RibbonButton.astro';
-import RibbonGroup from '../components/office/RibbonGroup.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
@@ -25,59 +23,8 @@ const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '
 		<AppWindow
 			app="word"
 			fileName={`${slug}.docx`}
-			tabs={['Home', 'Insert', 'Draw', 'Design', 'Layout', 'References', 'Review', 'View']}
 			status={`Page 1 of 1 · ~${words} words`}
 		>
-			<Fragment slot="ribbon">
-				<RibbonGroup label="Clipboard">
-					<RibbonButton variant="tall" icon="📋">Paste</RibbonButton>
-				</RibbonGroup>
-
-				<RibbonGroup label="Font">
-					<div class="flex flex-col gap-1">
-						<div class="flex gap-1">
-							<RibbonButton variant="select" wide>Newsreader</RibbonButton>
-							<RibbonButton variant="select">12</RibbonButton>
-						</div>
-						<div class="flex gap-1">
-							<RibbonButton style="bold">B</RibbonButton>
-							<RibbonButton style="italic">I</RibbonButton>
-							<RibbonButton style="underline">U</RibbonButton>
-							<RibbonButton>A▾</RibbonButton>
-						</div>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Paragraph">
-					<div class="flex flex-col gap-1">
-						<div class="flex gap-1">
-							<RibbonButton>≔</RibbonButton>
-							<RibbonButton>≡</RibbonButton>
-							<RibbonButton>≣</RibbonButton>
-						</div>
-						<div class="flex gap-1">
-							<RibbonButton>Line spacing</RibbonButton>
-						</div>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Styles" last>
-					<div class="flex gap-1">
-						<span
-							class="inline-flex h-11 w-16 flex-col items-center justify-center rounded-sm border border-line bg-surface text-[0.6rem] leading-tight"
-						>
-							<span class="text-[0.8rem] font-semibold text-word">AaBb</span>
-							<span class="text-muted">Heading</span>
-						</span>
-						<span
-							class="inline-flex h-11 w-16 flex-col items-center justify-center rounded-sm border border-line bg-surface text-[0.6rem] leading-tight"
-						>
-							<span class="font-doc text-[0.8rem]">AaBb</span>
-							<span class="text-muted">Normal</span>
-						</span>
-					</div>
-				</RibbonGroup>
-			</Fragment>
 
 			<!-- Ruler -->
 			<Fragment slot="subbar">

@@ -3,8 +3,6 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import AppWindow from '../components/office/AppWindow.astro';
-import RibbonButton from '../components/office/RibbonButton.astro';
-import RibbonGroup from '../components/office/RibbonGroup.astro';
 
 const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
 	(a, b) => a.data.order - b.data.order || b.data.year.localeCompare(a.data.year),
@@ -23,47 +21,8 @@ const description = 'Selected work — things I have designed, built, and shippe
 		<AppWindow
 			app="powerpoint"
 			fileName="projects.pptx"
-			tabs={['Home', 'Insert', 'Draw', 'Design', 'Transitions', 'Animations', 'Slide Show', 'View']}
 			status={`Slide 1 of ${projects.length} · English (US)`}
 		>
-			<Fragment slot="ribbon">
-				<RibbonGroup label="Slides">
-					<RibbonButton variant="tall" icon="▭">New Slide</RibbonButton>
-					<div class="flex flex-col gap-1">
-						<RibbonButton>Layout ▾</RibbonButton>
-						<RibbonButton>Reset</RibbonButton>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Font">
-					<div class="flex flex-col gap-1">
-						<div class="flex gap-1">
-							<RibbonButton variant="select" wide>Schibsted Grotesk</RibbonButton>
-							<RibbonButton variant="select">18</RibbonButton>
-						</div>
-						<div class="flex gap-1">
-							<RibbonButton style="bold">B</RibbonButton>
-							<RibbonButton style="italic">I</RibbonButton>
-							<RibbonButton style="underline">U</RibbonButton>
-						</div>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Drawing">
-					<div class="flex gap-1">
-						<span class="inline-flex size-8 items-center justify-center rounded-sm border border-line bg-surface text-xs">▭</span>
-						<span class="inline-flex size-8 items-center justify-center rounded-sm border border-line bg-surface text-xs">◯</span>
-						<span class="inline-flex size-8 items-center justify-center rounded-sm border border-line bg-surface text-xs">▷</span>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Slide Show" last>
-					<div class="flex flex-col gap-1">
-						<RibbonButton>▶ From Start</RibbonButton>
-						<RibbonButton>Rehearse</RibbonButton>
-					</div>
-				</RibbonGroup>
-			</Fragment>
 
 			<Fragment slot="subbar">
 				<div

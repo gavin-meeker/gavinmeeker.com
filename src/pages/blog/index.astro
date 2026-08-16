@@ -2,8 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import AppWindow from '../../components/office/AppWindow.astro';
-import RibbonButton from '../../components/office/RibbonButton.astro';
-import RibbonGroup from '../../components/office/RibbonGroup.astro';
 import Sheet from '../../components/office/Sheet.astro';
 
 const posts = (await getCollection('blog')).sort(
@@ -30,42 +28,8 @@ const fmt = (d: Date) =>
 		<AppWindow
 			app="excel"
 			fileName="writing.xlsx"
-			tabs={['Home', 'Insert', 'Draw', 'Formulas', 'Data', 'Review', 'View']}
 			status={`${posts.length} records`}
 		>
-			<Fragment slot="ribbon">
-				<RibbonGroup label="Clipboard">
-					<RibbonButton variant="tall" icon="📋">Paste</RibbonButton>
-				</RibbonGroup>
-
-				<RibbonGroup label="Font">
-					<div class="flex flex-col gap-1">
-						<div class="flex gap-1">
-							<RibbonButton variant="select" wide>Schibsted Grotesk</RibbonButton>
-							<RibbonButton variant="select">11</RibbonButton>
-						</div>
-						<div class="flex gap-1">
-							<RibbonButton style="bold">B</RibbonButton>
-							<RibbonButton style="italic">I</RibbonButton>
-							<RibbonButton style="underline">U</RibbonButton>
-						</div>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Data">
-					<div class="flex flex-col gap-1">
-						<RibbonButton>↓A Sort</RibbonButton>
-						<RibbonButton>▽ Filter</RibbonButton>
-					</div>
-				</RibbonGroup>
-
-				<RibbonGroup label="Editing" last>
-					<div class="flex flex-col gap-1">
-						<RibbonButton>Σ AutoSum</RibbonButton>
-						<RibbonButton>Find</RibbonButton>
-					</div>
-				</RibbonGroup>
-			</Fragment>
 
 			<Fragment slot="subbar">
 				<div class="flex items-center gap-2 border-b border-line bg-surface px-2 py-1.5">

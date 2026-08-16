@@ -8,7 +8,14 @@
 */
 interface Props {
 	cols?: number;
+	/** Rows the content needs. Padded up to `minRows` so the grid fills the page. */
 	rows?: number;
+	/**
+	 * Floor on rendered rows. A real sheet runs off the bottom of the window
+	 * rather than stopping in blank space, so render enough to overflow a tall
+	 * viewport and let the grid scroll.
+	 */
+	minRows?: number;
 	/** Minimum width before the sheet scrolls horizontally. */
 	minWidth?: string;
 	/**
@@ -19,7 +26,16 @@ interface Props {
 	activeRows?: [number, number];
 }
 
-const { cols = 8, rows = 30, minWidth = '46rem', activeCols, activeRows } = Astro.props;
+const {
+	cols = 8,
+	rows = 20,
+	minRows = 60,
+	minWidth = '46rem',
+	activeCols,
+	activeRows,
+} = Astro.props;
+
+const rowCount = Math.max(rows, minRows);
 
 const columns = Array.from({ length: cols }, (_, i) => String.fromCharCode(65 + i));
 
@@ -32,11 +48,11 @@ const gutterBase =
 	'flex items-center justify-center border-b border-line font-mono text-[0.72rem]';
 ---
 
-<div class="overflow-x-auto">
-	<div style={`min-width:${minWidth};`}>
+<div class="flex min-h-0 flex-1 flex-col overflow-auto">
+	<div class="flex min-h-full flex-col" style={`min-width:${minWidth};`}>
 		<!-- Column headers -->
 		<div
-			class="grid border-b-2 border-frame bg-header"
+			class="sticky top-0 z-10 grid border-b-2 border-frame bg-header"
 			style={`grid-template-columns: 2.5rem repeat(${cols}, minmax(0,1fr));`}
 		>
 			<span class="border-r border-line"></span>
@@ -57,11 +73,11 @@ const gutterBase =
 			}
 		</div>
 
-		<div class="grid" style="grid-template-columns: 2.5rem minmax(0,1fr);">
+		<div class="grid flex-1" style="grid-template-columns: 2.5rem minmax(0,1fr);">
 			<!-- Row gutter -->
 			<div class="grid auto-rows-[--spacing(row)] border-r-2 border-frame bg-header">
 				{
-					Array.from({ length: rows }, (_, i) => (
+					Array.from({ length: rowCount }, (_, i) => (
 						<span
 							class:list={[
 								gutterBase,
@@ -77,7 +93,10 @@ const gutterBase =
 			</div>
 
 			<!-- Cells -->
-			<div class="cells" style={`--cols:${cols}; min-height:calc(${rows} * var(--spacing-row));`}>
+			<div
+				class="cells"
+				style={`--cols:${cols}; min-height:calc(${rowCount} * var(--spacing-row));`}
+			>
 				<slot />
 			</div>
 		</div>
