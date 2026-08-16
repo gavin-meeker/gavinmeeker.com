@@ -256,6 +256,15 @@
     background: var(--color-app);
   }
 
+  .sheet-body {
+    min-width: var(--sheet-min, 46rem);
+  }
+  @media (width < 60rem) {
+    .sheet-body {
+      min-width: 100%;
+    }
+  }
+
   /* Word's page ruler. */
   .ruler {
     background-image: repeating-linear-gradient(
