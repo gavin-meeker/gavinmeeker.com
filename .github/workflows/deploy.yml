@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 # A newer push to main supersedes an in-flight run, but never cancel a
 # deploy that is already underway.
@@ -45,8 +46,10 @@ jobs:
   deploy:
     name: Deploy to Cloudflare
     needs: build
-    # Never deploy from a pull request — build only.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Deploy on pushes to main and on manual runs, never from a pull request.
+    # The ref check also means a manual run against a feature branch builds
+    # but stops short of shipping it to production.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: production
