@@ -1,0 +1,72 @@
+name: Tag Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  tag:
+    name: Create release tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the tag
+      pull-requests: read # look up the merged PR's source branch
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve source branch
+        id: src
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          branch="$(gh api "repos/${REPO}/commits/${SHA}/pulls" \
+            --jq '.[0].head.ref // empty' 2>/dev/null || true)"
+          [ -n "$branch" ] || branch="direct"
+          # Branch names allow characters git refs do not, and a fork PR can
+          # name a branch anything at all — reduce it to a safe slug.
+          slug="$(printf '%s' "$branch" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/[^a-z0-9._-]+/-/g; s/^[-.]+//; s/[-.]+$//' \
+            | cut -c1-40)"
+          [ -n "$slug" ] || slug="direct"
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        id: tag
+        env:
+          SLUG: ${{ steps.src.outputs.slug }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          ts="$(date -u +'%Y%m%d-%H%M%S')"
+          short="$(git rev-parse --short=7 "$SHA")"
+          tag="release/${ts}-${SLUG}-${short}"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "$tag" -m "Release ${ts} UTC from ${SLUG} @ ${short}"
+          git push origin "$tag"
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Tagged \`${tag}\`"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Source branch | \`${SLUG}\` |"
+            echo "| Commit | \`${short}\` |"
+            echo "| Tagged at | ${ts} UTC |"
+            echo
+            echo "Deploy it with **Actions → CI/CD Pipeline → Run workflow**, "
+            echo "putting \`${tag}\` in the ref field."
+          } >> "$GITHUB_STEP_SUMMARY"
