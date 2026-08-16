@@ -1,63 +1,93 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
 import Layout from '../layouts/BlogPost.astro';
 ---
 
 <Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
+	title="About"
+	description="Software engineer at FinQuery, building full-stack financial applications in C#, .NET, and React. I came to engineering through accounting."
+	pubDate={new Date('August 16 2026')}
 >
 	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+		I'm a software engineer at <a href="https://finquery.com">FinQuery</a> in Atlanta, where I
+		build full-stack financial applications in C#, .NET, and React. Most of my work sits where
+		accounting rules meet software: turning accounting standards systems
+		that calculate correctly.
 	</p>
 
 	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
+		I came to engineering sideways. I started at FinQuery in 2022 in customer support,
+		resolving configuration issues for enterprise clients. That turned into more of a product
+		role, where I was the subject-matter expert for lease accounting standards: ASC 842, IFRS 16,
+		GASB 87 and 96. I translated these standards into technical specs and user stories.
 	</p>
 
 	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+		Writing specs for others to implement was not where I wanted to end up though. I moved into quality automation, then into
+		engineering. The path was a bit unconventional, but it left me with something I use constantly:
+		I know what the numbers are supposed to do before I write the code that produces them.
+	</p>
+
+	<h2>What I work on</h2>
+
+	<p>
+		Most recently I shipped a greenfield financial application from initial setup through general
+		availability: designing the backend, building the React frontend, and deploying it on AWS
+		EKS. Inside it is an amortization engine I built to handle the variable inputs that real
+		financial calculations require.
 	</p>
 
 	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
+        As mentioned, I spent a year in quality automation. I built internal
+		C# and React tools that queried SQL Server to verify the accounting engine's output against
+		the database. This removed a large amount of manual regression testing on financial
+		calculations. I wrote Playwright and NUnit suites wired into Jenkins and GitHub Actions, set
+		up blue/green deployments on EKS for zero-downtime releases, standardized Git branching across
+		five product release pipelines, and mentored a junior engineer on automation frameworks and
+		the accounting behind what we were testing.
 	</p>
 
+	<h2>Tools</h2>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Area</th>
+				<th>What I use</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Languages &amp; frameworks</td>
+				<td>C#, .NET, TypeScript, JavaScript, React, Node.js</td>
+			</tr>
+			<tr>
+				<td>Architecture &amp; systems</td>
+				<td>Kubernetes, AWS, REST APIs, microservices, relational databases</td>
+			</tr>
+			<tr>
+				<td>Testing &amp; automation</td>
+				<td>Playwright, NUnit, GitHub Actions, Jenkins, integration testing</td>
+			</tr>
+			<tr>
+				<td>AI &amp; orchestration</td>
+				<td>LLM orchestration, agentic workflows</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Education</h2>
+
 	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+		<strong>M.S., Software Engineering</strong> — Kennesaw State University, 2025 (4.0 GPA)<br />
+		<strong>B.B.A., Accounting</strong> — Kennesaw State University, 2021
+	</p>
+
+	<h2>Elsewhere</h2>
+
+	<p>
+		Code lives on <a href="https://github.com/gavin-meeker">GitHub</a>, including <a
+			href="https://github.com/gavin-meeker/gavinmeeker.com">the source for this site</a
+		>. Email is <a href="mailto:gmeeker99@gmail.com">gmeeker99@gmail.com</a>. I write about
+		building things over in <a href="/blog">Writing</a>.
 	</p>
 </Layout>
