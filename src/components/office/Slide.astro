@@ -1,0 +1,160 @@
+---
+/*
+  One project slide. The `layout` field in the project's frontmatter picks
+  which arrangement is used, the way a real deck applies a slide layout.
+
+  Screenshots use object-contain, never object-cover — a UI screenshot cropped
+  to fill a box loses the thing it is meant to show.
+*/
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+
+interface Props {
+	project: CollectionEntry<'projects'>;
+	index: number;
+	total: number;
+}
+
+const { project, index, total } = Astro.props;
+const { title, blurb, bullets, screenshot, screenshotAlt, year, tags, url, repo, layout } =
+	project.data;
+
+// Fall back to the blurb as a single bullet when none are authored.
+const points = bullets.length > 0 ? bullets : [{ text: blurb, sub: [] as string[] }];
+
+const hasLinks = Boolean(url || repo);
+const showImage = Boolean(screenshot) && layout !== 'statement';
+---
+
+<section id={`slide-${index + 1}`} class="w-full max-w-[68rem] shrink-0 scroll-mt-4">
+	<div class="flex flex-col border border-line bg-surface shadow-page wide:aspect-video">
+		<!-- Slide title bar -->
+		<div class="shrink-0 border-b-2 border-app px-6 pt-6 pb-3 wide:px-10 wide:pt-8">
+			<div class="flex items-baseline gap-3">
+				<h2 class="m-0 text-2xl leading-tight font-bold text-ink wide:text-3xl">{title}</h2>
+				<span class="ml-auto font-mono text-[0.66rem] tracking-widest text-muted">{year}</span>
+			</div>
+		</div>
+
+		<div
+			class:list={[
+				'min-h-0 flex-1 p-6 wide:p-10',
+				layout === 'statement'
+					? 'flex flex-col justify-center gap-6'
+					: layout === 'showcase'
+						? 'flex flex-col gap-5'
+						: 'grid gap-6 wide:gap-10 wide:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]',
+			]}
+		>
+			<!-- Text column -->
+			<div
+				class:list={[
+					'flex min-w-0 flex-col gap-5',
+					layout === 'split-reverse' && 'wide:order-2',
+					layout === 'showcase' && 'shrink-0',
+				]}
+			>
+				{
+					layout === 'statement' ? (
+						<p class="m-0 max-w-[46rem] text-xl leading-relaxed text-ink wide:text-2xl">
+							{blurb}
+						</p>
+					) : (
+						<ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+							{points.map((point) => (
+								<li class="text-[0.95rem] leading-relaxed text-ink">
+									<span class="flex gap-2.5">
+										{/* Level one: solid square, PowerPoint's default marker. */}
+										<span class="mt-2 size-1.5 shrink-0 bg-app" aria-hidden="true" />
+										<span>{point.text}</span>
+									</span>
+
+									{point.sub.length > 0 && (
+										<ul class="mt-1.5 mb-1 flex list-none flex-col gap-1 pl-6">
+											{point.sub.map((sub) => (
+												<li class="flex gap-2.5 text-[0.85rem] leading-relaxed text-muted">
+													{/* Level two: hollow, smaller — the indent alone is too weak. */}
+													<span
+														class="mt-1.5 size-1.5 shrink-0 border border-app"
+														aria-hidden="true"
+													/>
+													<span>{sub}</span>
+												</li>
+											))}
+										</ul>
+									)}
+								</li>
+							))}
+						</ul>
+					)
+				}
+
+				{
+					tags.length > 0 && (
+						<ul class="flex list-none flex-wrap gap-2 p-0">
+							{tags.map((tag) => (
+								<li class="border border-line px-2 py-1 font-mono text-[0.62rem] tracking-widest text-muted uppercase">
+									{tag}
+								</li>
+							))}
+						</ul>
+					)
+				}
+
+				{
+					hasLinks && (
+						<div class="flex flex-wrap items-center gap-5">
+							{url && (
+								<a
+									href={url}
+									target="_blank"
+									rel="noopener"
+									class="flex items-center gap-2 font-mono text-[0.68rem] tracking-widest text-app uppercase underline underline-offset-4"
+								>
+									<Icon name="link" />
+									Visit
+								</a>
+							)}
+							{repo && (
+								<a
+									href={repo}
+									target="_blank"
+									rel="noopener"
+									class="flex items-center gap-2 font-mono text-[0.68rem] tracking-widest text-app uppercase underline underline-offset-4"
+								>
+									<Icon name="github" />
+									Source
+								</a>
+							)}
+						</div>
+					)
+				}
+			</div>
+
+			<!-- Screenshot -->
+			{
+				showImage && (
+					<div
+						class:list={[
+							'flex min-h-0 items-center justify-center overflow-hidden border border-line bg-head p-2',
+							layout === 'split-reverse' && 'wide:order-1',
+							layout === 'showcase' && 'min-h-0 flex-1',
+						]}
+					>
+						<Image
+							src={screenshot!}
+							alt={screenshotAlt ?? ''}
+							width={1400}
+							class="max-h-full w-auto max-w-full object-contain"
+						/>
+					</div>
+				)
+			}
+		</div>
+	</div>
+
+	<p class="mt-3 px-1 font-mono text-[0.66rem] text-muted">
+		Slide {index + 1} of {total}
+	</p>
+</section>

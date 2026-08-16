@@ -136,7 +136,7 @@ const ROWS = TOTAL_ROW + 2;
 					class="app-powerpoint cell-head flex items-center px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
 					style={`grid-column: 3 / 7; grid-row: ${PROJ_HEAD};`}
 				>
-					Stack
+					Description
 				</div>
 				<div
 					class="app-powerpoint cell-head flex items-center justify-end px-2 font-mono text-[0.75rem] font-medium tracking-[0.14em] uppercase"
@@ -162,7 +162,7 @@ const ROWS = TOTAL_ROW + 2;
 								class="flex h-full items-center truncate border-l border-line px-2 text-[0.78rem] text-muted"
 								style="grid-column: 3 / 7;"
 							>
-								{p.data.tags.join(', ')}
+								{p.data.blurb}
 							</span>
 							<span
 								class="flex h-full items-center justify-end border-l border-line px-2 font-mono text-[0.72rem] text-ink"
