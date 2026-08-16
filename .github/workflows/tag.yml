@@ -33,10 +33,11 @@ jobs:
             --jq '.[0].head.ref // empty' 2>/dev/null || true)"
           [ -n "$branch" ] || branch="direct"
           # Branch names allow characters git refs do not, and a fork PR can
-          # name a branch anything at all — reduce it to a safe slug.
+          # name a branch anything at all — reduce it to a safe slug. Note
+          # underscores are stripped too: they separate the tag's fields.
           slug="$(printf '%s' "$branch" \
             | tr '[:upper:]' '[:lower:]' \
-            | sed -E 's/[^a-z0-9._-]+/-/g; s/^[-.]+//; s/[-.]+$//' \
+            | sed -E 's/[^a-z0-9.-]+/-/g; s/^[-.]+//; s/[-.]+$//' \
             | cut -c1-40)"
           [ -n "$slug" ] || slug="direct"
           echo "slug=$slug" >> "$GITHUB_OUTPUT"
@@ -48,9 +49,9 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          ts="$(date -u +'%Y%m%d-%H%M%S')"
+          ts="$(date -u +'%Y%m%d%H%M%S')"
           short="$(git rev-parse --short=7 "$SHA")"
-          tag="release/${ts}-${SLUG}-${short}"
+          tag="${ts}_${SLUG}_${short}"
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
