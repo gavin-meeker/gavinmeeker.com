@@ -42,10 +42,16 @@ const description = 'Selected work — things I have designed, built, and shippe
 			-->
 			<div class="flex min-h-0 flex-1 bg-canvas">
 				<!-- Slide thumbnail rail -->
+				<!--
+				  The nav stretches full height so its right border runs the whole
+				  column; the inner list is what sticks, and scrolls internally
+				  once there are more thumbnails than fit the viewport.
+				-->
 				<nav
 					aria-label="Slides"
-					class="hidden w-52 shrink-0 flex-col gap-3 overflow-y-auto border-r border-line bg-head p-3 wide:flex"
+					class="hidden w-52 shrink-0 border-r border-line bg-head wide:block"
 				>
+					<div class="sticky top-0 flex max-h-dvh flex-col gap-3 overflow-y-auto p-3">
 					{
 						projects.map((p, i) => (
 							<a href={`#slide-${i + 1}`} class="group flex gap-2 no-underline">
@@ -59,6 +65,7 @@ const description = 'Selected work — things I have designed, built, and shippe
 							</a>
 						))
 					}
+					</div>
 				</nav>
 
 				<!-- Slide canvas -->
