@@ -9,11 +9,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      ref:
-        description: 'Tag or ref to build and deploy (blank = the branch selected above)'
-        required: false
-        type: string
 
 # A newer push to main supersedes an in-flight run, but never cancel a
 # deploy that is already underway.
@@ -31,8 +26,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -56,10 +49,12 @@ jobs:
   deploy:
     name: Deploy to Cloudflare
     needs: build
-    # Deploy on pushes to main and on manual runs, never from a pull request.
-    # The ref check also means a manual run against a feature branch builds
-    # but stops short of shipping it to production.
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    # Deploy from main or from any tag, never from a pull request. Selecting
+    # a tag in "Run workflow" sets github.ref to refs/tags/*, which is how
+    # rollback works; a manual run against a feature branch still only builds.
+    if: >-
+      github.event_name != 'pull_request' &&
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -67,8 +62,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -85,9 +78,26 @@ jobs:
           name: dist
           path: dist/
 
+      - name: Describe this deployment
+        id: meta
+        env:
+          SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          short="${SHA:0:7}"
+          # Sanitised: these values are interpolated into the wrangler command.
+          ref="$(printf '%s' "$REF_NAME" | sed -E 's/[^a-zA-Z0-9._\/-]+/-/g' | cut -c1-60)"
+          echo "short=$short" >> "$GITHUB_OUTPUT"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
+          command: >-
+            deploy
+            --tag ${{ steps.meta.outputs.short }}
+            --message "${{ steps.meta.outputs.ref }} @ ${{ steps.meta.outputs.short }} (run ${{ github.run_number }})"
+

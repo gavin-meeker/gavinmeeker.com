@@ -27,11 +27,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           branch="$(gh api "repos/${REPO}/commits/${SHA}/pulls" \
             --jq '.[0].head.ref // empty' 2>/dev/null || true)"
-          [ -n "$branch" ] || branch="direct"
+          # No associated PR means the commit was pushed straight to the
+          # branch, so the branch it landed on is the honest answer.
+          [ -n "$branch" ] || branch="$REF_NAME"
           # Branch names allow characters git refs do not, and a fork PR can
           # name a branch anything at all — reduce it to a safe slug. Note
           # underscores are stripped too: they separate the tag's fields.
@@ -39,7 +42,7 @@ jobs:
             | tr '[:upper:]' '[:lower:]' \
             | sed -E 's/[^a-z0-9.-]+/-/g; s/^[-.]+//; s/[-.]+$//' \
             | cut -c1-40)"
-          [ -n "$slug" ] || slug="direct"
+          [ -n "$slug" ] || slug="main"
           echo "slug=$slug" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
