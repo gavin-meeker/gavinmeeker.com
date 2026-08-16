@@ -3,6 +3,8 @@
   Status bar. This is the site's primary navigation — the sheet tabs along the
   bottom of the window, where a spreadsheet keeps them.
 */
+import Icon from './Icon.astro';
+
 interface Props {
 	status?: string;
 }
@@ -100,7 +102,25 @@ const year = new Date().getFullYear();
 
 	<span class="flex-1"></span>
 
-	<span class="hidden shrink-0 font-mono text-[0.62rem] tracking-widest text-muted wide:inline">
+	<!--
+	  Source for this site. The status bar is where a spreadsheet keeps document
+	  metadata, and this is metadata about the document you are looking at —
+	  distinct from the CONTACT rows, which are ways to reach Gavin.
+	-->
+	<a
+		href="https://github.com/gavin-meeker/gavinmeeker.com"
+		target="_blank"
+		rel="noopener"
+		title="View the source for this site on GitHub"
+		class="flex shrink-0 items-center gap-1.5 font-mono text-[0.62rem] tracking-widest text-muted uppercase no-underline transition-colors hover:text-app"
+	>
+		<Icon name="github" class="size-3.5" />
+		<span class="hidden wide:inline">Source</span>
+	</a>
+
+	<span
+		class="ml-3 hidden shrink-0 border-l border-line pl-3 font-mono text-[0.62rem] tracking-widest text-muted wide:inline"
+	>
 		&copy; {year} Gavin Meeker
 	</span>
 	<span
