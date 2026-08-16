@@ -1,13 +1,5 @@
 @import "tailwindcss";
 
-/*
-  Design tokens. Single source of truth — every token here also generates
-  matching utilities, so `--color-ink` gives `text-ink`, `bg-ink`, `border-ink`.
-
-  The site is dressed as an office suite: Excel for the workspace pages, Word
-  for long-form posts, PowerPoint for projects. Shared chrome neutrals below,
-  then one accent per app.
-*/
 @theme {
   /* Application chrome */
   --color-canvas: #eceef1; /* desktop behind the window */
@@ -27,11 +19,6 @@
   --color-powerpoint: #c43e1c;
   --color-amber: #b45309; /* "in progress" status text */
 
-  /*
-    The accent for whichever app is on screen. Utilities like `text-app` and
-    `bg-app` compile to `var(--color-app)`, so the `.app-*` classes below
-    retint an entire page by reassigning this one variable.
-  */
   --color-app: var(--color-excel);
 
   --font-sans: var(--font-schibsted), system-ui, sans-serif;
